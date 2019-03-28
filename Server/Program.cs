@@ -6,7 +6,9 @@ namespace Server
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+			Console.WriteLine("Runing");
+			Server server = new Server();
+			server.Listen(8000);
         }
     }
 }
