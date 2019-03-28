@@ -16,7 +16,7 @@ namespace Server
 		}
 		public void Listen(int port)
 		{
-			IPEndPoint ipe = new IPEndPoint(IPAddress.Loopback, port);
+			IPEndPoint ipe = new IPEndPoint(IPAddress.Any, port);
 			socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 			socket.Bind(ipe);
 			socket.Listen(0);
