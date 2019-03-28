@@ -8,7 +8,7 @@ namespace Server
         {
 			Console.WriteLine("Runing");
 			Server server = new Server();
-			server.Listen(8000);
+			server.Listen(6000);
         }
     }
 }

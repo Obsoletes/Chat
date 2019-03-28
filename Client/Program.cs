@@ -8,7 +8,7 @@ namespace Client
 		{
 			using (Client client = new Client("test"))
 			{
-				client.Connect(8000);
+				client.Connect(6000);
 				client.QueryUser();
 				foreach (string user in client.QueryUser())
 				{
