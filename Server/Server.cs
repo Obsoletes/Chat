@@ -12,7 +12,7 @@ namespace Server
 	{
 		public Server()
 		{
-			users = new List<string> { "123", "456", "79", "123", "456", "79" "123", "456", "79" };
+			users = new List<string> { "123", "456", "79", "123", "456", "79", "123", "456", "79" };
 		}
 		public void Listen(int port)
 		{
