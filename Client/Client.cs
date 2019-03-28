@@ -46,10 +46,11 @@ namespace Client
 				byte* start = ptr;
 				while (start <= end)
 				{
-					byte nameLength = *ptr;
+					byte nameLength = *start;
 					start += 1;
 					if (start + nameLength <= end)
 						users.Add(Encoding.UTF8.GetString(start, nameLength));
+					start += nameLength;
 				}
 			}
 			return users;

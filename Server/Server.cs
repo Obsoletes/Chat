@@ -39,11 +39,11 @@ namespace Server
 			int bytes = socket.Receive(recByte, recByte.Length, 0);
 			if (recByte[0] == 'Q')
 			{
-				WriteQueryUserResult(recByte);
-				socket.Send(recByte);
+				int length = WriteQueryUserResult(recByte);
+				socket.Send(recByte, length, SocketFlags.None);
 			}
 		}
-		private unsafe void WriteQueryUserResult(byte[] bys)
+		private unsafe int WriteQueryUserResult(byte[] bys)
 		{
 			fixed (byte* ptr = bys)
 			{
@@ -59,6 +59,7 @@ namespace Server
 						start += 1;
 					}
 				}
+				return (int)(start - ptr);
 			}
 		}
 		private byte[] echoBys = Encoding.UTF8.GetBytes("<echo>");
