@@ -39,8 +39,10 @@ namespace Server
 			int bytes = socket.Receive(recByte, recByte.Length, 0);
 			if (recByte[0] == 'Q')
 			{
+				Console.Error.WriteLine("receive Query");
 				int length = WriteQueryUserResult(recByte);
 				socket.Send(recByte, length, SocketFlags.None);
+				Console.Error.WriteLine("send Query length:{0}", length);
 			}
 		}
 		private unsafe int WriteQueryUserResult(byte[] bys)

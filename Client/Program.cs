@@ -9,10 +9,15 @@ namespace Client
 			using (Client client = new Client("test"))
 			{
 				client.Connect(6000);
-				foreach (string user in client.QueryUser())
+				while(true)
 				{
-					Console.WriteLine(user);
+					foreach (string user in client.QueryUser())
+					{
+						Console.WriteLine(user);
+					}
+					Console.ReadLine();
 				}
+				
 			}
 			Console.ReadLine();
 		}
