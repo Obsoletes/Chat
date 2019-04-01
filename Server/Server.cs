@@ -82,6 +82,7 @@ namespace Server
 							break;
 					}
 					string keyString = Encoding.UTF8.GetString(recByte, 0, pos);
+					Console.WriteLine("Do Action {0}", keyString);
 					SocketRespond? respond = SendRequest(handles.Find(keyString), user, recByte, pos);
 					if (respond != null)
 					{
