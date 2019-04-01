@@ -79,7 +79,7 @@ namespace Server
 					int pos = 0;
 					for (; pos < bytes; ++pos)
 					{
-						if (recByte[pos] == '\0')
+						if (recByte[pos] == '$')
 							break;
 					}
 					string keyString = Encoding.UTF8.GetString(recByte, 0, pos);

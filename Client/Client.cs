@@ -29,21 +29,21 @@ namespace Client
 		}
 		public string Hello()
 		{
-			socket.Send(Encoding.UTF8.GetBytes("enter"));
+			socket.Send(Encoding.UTF8.GetBytes("enter$"));
 			byte[] recBytes = new byte[4096];
 			int bytes = socket.Receive(recBytes, recBytes.Length, 0);
 			return Encoding.UTF8.GetString(recBytes);
 		}
 		public string Echo(string message)
 		{
-			socket.Send(Encoding.UTF8.GetBytes("echo\0" + message));
+			socket.Send(Encoding.UTF8.GetBytes("echo$" + message));
 			byte[] recBytes = new byte[4096];
 			int bytes = socket.Receive(recBytes, recBytes.Length, 0);
 			return Encoding.UTF8.GetString(recBytes);
 		}
 		public IEnumerable<string> QueryUser()
 		{
-			socket.Send(Encoding.UTF8.GetBytes("query"));
+			socket.Send(Encoding.UTF8.GetBytes("query$"));
 			byte[] recBytes = new byte[4096];
 			int bytes = socket.Receive(recBytes, recBytes.Length, 0);
 			Console.Error.WriteLine(bytes);
