@@ -24,25 +24,33 @@ namespace Client
 			IPEndPoint ipe = new IPEndPoint(ip, port);
 			socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 			socket.Connect(ipe);
-			socket.Send(Encoding.UTF8.GetBytes("<echo>"));
+			socket.Send(Encoding.UTF8.GetBytes("E" + Name));
+		}
+		public string Hello()
+		{
+			socket.Send(Encoding.UTF8.GetBytes("enter"));
+			byte[] recBytes = new byte[4096];
+			int bytes = socket.Receive(recBytes, recBytes.Length, 0);
+			return Encoding.UTF8.GetString(recBytes);
 		}
 		public IEnumerable<string> QueryUser()
 		{
-			socket.Send(Encoding.UTF8.GetBytes("Q"));
+			socket.Send(Encoding.UTF8.GetBytes("query"));
 			byte[] recBytes = new byte[4096];
 			int bytes = socket.Receive(recBytes, recBytes.Length, 0);
-			return AnalysisQueryUserResult(recBytes);
+			Console.Error.WriteLine(bytes);
+			return AnalysisQueryUserResult(recBytes, bytes);
 		}
 		public void Dispose()
 		{
 			((IDisposable)socket)?.Dispose();
 		}
-		private unsafe IEnumerable<string> AnalysisQueryUserResult(byte[] bys)
+		private unsafe IEnumerable<string> AnalysisQueryUserResult(byte[] bys, int length)
 		{
 			List<string> users = new List<string>();
 			fixed (byte* ptr = bys)
 			{
-				byte* end = ptr + bys.Length;
+				byte* end = ptr + length;
 				byte* start = ptr;
 				while (start <= end)
 				{

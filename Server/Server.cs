@@ -5,67 +5,105 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
-using System.Runtime.InteropServices;
+using System.Reflection;
+#nullable enable
 namespace Server
 {
-	class Server : IDisposable
+	class Server
 	{
 		public Server()
 		{
-			users = new List<string> { "123", "456", "79", "123", "456", "79", "123", "456", "79" };
+			users = new List<User>();
+			handles = new Trie<ISocketHandle>();
 		}
 		public void Listen(int port)
 		{
 			IPEndPoint ipe = new IPEndPoint(IPAddress.Any, port);
-			socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-			socket.Bind(ipe);
-			socket.Listen(0);
-			byte[] recByte = new byte[512];
-			while (true)
+			using (Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
 			{
-				Socket serverSocket = socket.Accept();
-				int bytes = serverSocket.Receive(recByte, recByte.Length, 0);
-				Task.Run(() => Loop(serverSocket), CancellationToken.None);
+				socket.Bind(ipe);
+				socket.Listen(0);
+				byte[] recByte = new byte[512];
+				while (true)
+				{
+					Socket userSocket = socket.Accept();
+					if (TryVerify(userSocket, out string name))
+					{
+						Task.Run(() => Loop(userSocket, name), CancellationToken.None);
+					}
+					else
+					{
+						userSocket.Shutdown(SocketShutdown.Both);
+					}
+				}
 			}
 		}
 
-		public void Dispose()
+		private bool TryVerify(Socket socket, out string name)
 		{
-			((IDisposable)socket)?.Dispose();
-		}
-		private void Loop(Socket socket)
-		{
-			byte[] recByte = new byte[512];
-			int bytes = socket.Receive(recByte, recByte.Length, 0);
-			if (recByte[0] == 'Q')
+			byte[] recByte = new byte[128];
+			int length = socket.Receive(recByte);
+			if (recByte[0] == 'E')
 			{
-				Console.Error.WriteLine("receive Query");
-				int length = WriteQueryUserResult(recByte);
-				socket.Send(recByte, length, SocketFlags.None);
-				Console.Error.WriteLine("send Query length:{0}", length);
+				name = Encoding.UTF8.GetString(recByte, 1, length - 1);
+				return true;
 			}
+			name = string.Empty;
+			return false;
 		}
-		private unsafe int WriteQueryUserResult(byte[] bys)
+		public void FindSocketHandle(Assembly assembly)
 		{
-			fixed (byte* ptr = bys)
+			foreach (Type type in assembly.GetTypes())
 			{
-				byte* start = ptr;
-				foreach (string user in users)
+				SocketHandleAttribute attribute = type.GetCustomAttribute<SocketHandleAttribute>();
+				if (attribute != null)
 				{
-					byte[] tmp = Encoding.UTF8.GetBytes(user);
-					*start = (byte)tmp.Length;
-					start += 1;
-					for (int i = 0; i < tmp.Length; i++)
+					object ob = type.GetConstructor(new Type[] { }).Invoke(new object[] { });
+					if (ob is ISocketHandle handle)
 					{
-						*start = tmp[i];
-						start += 1;
+						handles.Insert(attribute.Prefix, handle);
 					}
 				}
-				return (int)(start - ptr);
 			}
 		}
-		private byte[] echoBys = Encoding.UTF8.GetBytes("<echo>");
-		private Socket socket;
-		private List<string> users;
+		private void Loop(Socket socket, string name)
+		{
+			User user = new User(name, socket, users);
+			byte[] recByte = new byte[512];
+			try
+			{
+				while (true)
+				{
+					int bytes = socket.Receive(recByte, recByte.Length, 0);
+					int pos = 0;
+					for (; pos < bytes; ++pos)
+					{
+						if (recByte[pos] == '\0')
+							break;
+					}
+					string keyString = Encoding.UTF8.GetString(recByte, 0, pos);
+					SocketRespond? respond = SendRequest(handles.Find(keyString), user, recByte, pos);
+					if (respond != null)
+					{
+						socket.Send(respond.Body);
+					}
+				}
+			}
+			catch (SocketException ex)
+			{
+				if (socket.Connected == true)
+				{
+					socket.Shutdown(SocketShutdown.Both);
+				}
+				Console.WriteLine(ex.StackTrace);
+			}
+		}
+
+		private unsafe SocketRespond? SendRequest(ISocketHandle? handle, User user, byte[] body, int pos)
+		{
+			return handle?.Handle(new SocketRequest(user, body, pos));
+		}
+		private Trie<ISocketHandle> handles;
+		private List<User> users;
 	}
 }
