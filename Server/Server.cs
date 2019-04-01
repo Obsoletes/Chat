@@ -83,10 +83,10 @@ namespace Server
 					}
 					string keyString = Encoding.UTF8.GetString(recByte, 0, pos);
 					Console.WriteLine("Do Action {0}", keyString);
-					SocketRespond? respond = SendRequest(handles.Find(keyString), user, recByte, pos);
+					SocketRespond? respond = SendRequest(handles.Find(keyString), user, recByte, bytes, pos);
 					if (respond != null)
 					{
-						socket.Send(respond.Body);
+						socket.Send(respond.Body, respond.Length, SocketFlags.None);
 					}
 				}
 			}
@@ -100,9 +100,9 @@ namespace Server
 			}
 		}
 
-		private unsafe SocketRespond? SendRequest(ISocketHandle? handle, User user, byte[] body, int pos)
+		private unsafe SocketRespond? SendRequest(ISocketHandle? handle, User user, byte[] body, int length, int pos)
 		{
-			return handle?.Handle(new SocketRequest(user, body, pos));
+			return handle?.Handle(new SocketRequest(user, body, pos, length));
 		}
 		private Trie<ISocketHandle> handles;
 		private List<User> users;

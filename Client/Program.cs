@@ -11,7 +11,7 @@ namespace Client
 				client.Connect(6000);
 				while(true)
 				{
-					Console.WriteLine("1 for query\n2for enter");
+					Console.WriteLine("1 for query\n2 for enter\n3 for echo");
 					switch (Console.ReadLine())
 					{
 						case "1":
@@ -21,7 +21,11 @@ namespace Client
 							}
 							break;
 						case "2":
-
+							Console.WriteLine(client.Hello());
+							break;
+						case "3":
+							string str = Console.ReadLine();
+							Console.WriteLine(client.Echo(str));
 							break;
 					}
 				}

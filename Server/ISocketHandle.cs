@@ -6,11 +6,12 @@ namespace Server
 {
 	public class SocketRequest
 	{
-		public SocketRequest(User user, byte[] body, int pos)
+		public SocketRequest(User user, byte[] body, int pos,int length)
 		{
 			this.Body = body;
 			this.User = user;
 			this.Pos = pos;
+			this.Length = length;
 		}
 		public User User
 		{
@@ -23,6 +24,11 @@ namespace Server
 			set;
 		}
 		public int Pos
+		{
+			get;
+			set;
+		}
+		public int Length
 		{
 			get;
 			set;
