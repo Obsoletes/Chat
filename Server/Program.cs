@@ -9,8 +9,8 @@ namespace Server
 			Console.WriteLine("Runing");
 			Server server = new Server();
 			server.FindSocketHandle(typeof(Program).Assembly);
-			/*server.Listen(6000);
-			Trie<string> trie = new Trie<string>();
+			server.Listen(6000);
+			/*Trie<string> trie = new Trie<string>();
 			trie.Insert("123", "a");
 			trie.Insert("123", "b");
 			trie.Insert("123", "c");
