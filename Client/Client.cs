@@ -19,9 +19,9 @@ namespace Client
 		}
 		public void Connect(int port)
 		{
-			//string host = "47.100.172.185";
-			//IPAddress ip = IPAddress.Parse(host);
-			IPAddress ip = IPAddress.Loopback;
+			string host = "47.100.172.185";
+			IPAddress ip = IPAddress.Parse(host);
+			//IPAddress ip = IPAddress.Loopback;
 			IPEndPoint ipe = new IPEndPoint(ip, port);
 			socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 			socket.Connect(ipe);
@@ -36,7 +36,7 @@ namespace Client
 		}
 		public string Echo(string message)
 		{
-			socket.Send(Encoding.UTF8.GetBytes("enter" + message));
+			socket.Send(Encoding.UTF8.GetBytes("echo\0" + message));
 			byte[] recBytes = new byte[4096];
 			int bytes = socket.Receive(recBytes, recBytes.Length, 0);
 			return Encoding.UTF8.GetString(recBytes);

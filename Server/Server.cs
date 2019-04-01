@@ -11,6 +11,7 @@ namespace Server
 {
 	class Server
 	{
+		static readonly byte[] Empty = new byte[0];
 		public Server()
 		{
 			users = new List<User>();
@@ -87,6 +88,10 @@ namespace Server
 					if (respond != null)
 					{
 						socket.Send(respond.Body, respond.Length, SocketFlags.None);
+					}
+					else
+					{
+						  socket.Send(Empty);
 					}
 				}
 			}
