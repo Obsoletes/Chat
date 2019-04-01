@@ -82,7 +82,7 @@ namespace Server
 						if (recByte[pos] == '$')
 							break;
 					}
-					string keyString = Encoding.UTF8.GetString(recByte, 0, pos);
+					string keyString = Encoding.UTF8.GetString(recByte, 0, pos - 1);
 					Console.WriteLine("Do Action {0}", keyString);
 					SocketRespond? respond = SendRequest(handles.Find(keyString), user, recByte, bytes, pos);
 					if (respond != null)
@@ -91,7 +91,7 @@ namespace Server
 					}
 					else
 					{
-						  socket.Send(Empty);
+						socket.Send(Empty);
 					}
 				}
 			}
